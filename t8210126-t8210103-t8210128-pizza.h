@@ -27,9 +27,15 @@
 #define DELIVERY_MIN_TIME 5
 #define DELIVERY_MAX_TIME 15
 
-pthread_mutex_t income_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t pizza_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t order_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t phone_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t phone_available = PTHREAD_COND_INITIALIZER;
+
+pthread_mutex_t cook_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cook_available = PTHREAD_COND_INITIALIZER;
+
+pthread_mutex_t deliverer_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t deliverer_available = PTHREAD_COND_INITIALIZER;
+
 pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int total_revenue = 0;
