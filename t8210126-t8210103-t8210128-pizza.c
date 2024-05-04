@@ -32,7 +32,7 @@ void *cook_thread(void *arg) {
 
 
 void *deliverer_thread(void *arg) {
- while (1) {
+ while (1) { // εβαλα 1 γιατι δεν ξερω αν το vm του εργαστηριου εχει c99 η μεταγενεστερη εκδοση της c
         
         pthread_mutex_lock(&order_mutex);
         int order_number = next_order_number++;
