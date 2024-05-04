@@ -46,7 +46,16 @@ void *deliverer_thread(void *arg) {
     pthread_exit(NULL);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Usage: %s <Ncust> <Seed>\n", argv[0]);
+        return 1;
+    }
+
+    Ncust = atoi(argv[1]);
+    int seed = atoi(argv[2]);
+    srand(seed);
+    
     pthread_t customer_threads[Ncust];
     pthread_t telephone_threads[NUM_TELEPHONES];
     pthread_t cook_threads[NUM_COOKS];
