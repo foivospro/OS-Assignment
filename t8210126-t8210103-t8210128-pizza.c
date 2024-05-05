@@ -18,7 +18,7 @@ void *customer_thread(void *arg) {
     	sleep(rand() % (ORDER_MAX_TIME - ORDER_MIN_TIME + 1) + ORDER_MIN_TIME);
     }
     
-    while (phone_calls > NUM_TELEPHONES) {
+    while (phone_calls >= NUM_TELEPHONES) {
 		pthread_cond_wait(&call_available, &calling_mutex);
     }
     
@@ -47,9 +47,9 @@ void *telephone_thread(void *arg) {
     		if (pizza_type < P_MARGARITA) {
     			margherita_sold ++;
     			total_revenue += C_MARGARITA;
-    		} else if (pizza_type < P_MARGARITA + P_PEPERONI) {
+    		} else if (pizza_type < P_MARGARITA + P_PEPPERONI) {
     			pepperoni_sold ++;
-    			total_revenue += C_PEPERONI;
+    			total_revenue += C_PEPPERONI;
     		} else {
     			special_sold++;
     			total_revenue += C_SPECIAL;
