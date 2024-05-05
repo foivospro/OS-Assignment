@@ -9,18 +9,64 @@ typedef struct {
     // εδώ τα πεδία που χρειάζονται για την κάθε παραγγελία
 } OrderData;
 
-
 void *customer_thread(void *arg) {
+
     int customer_id = *((int *)arg);
-    // 
+    pthread_mutex_lock(&calling_mutex);
+    
+    if (*customer_id != 1) {
+    	sleep(rand() % (ORDER_MAX_TIME - ORDER_MIN_TIME + 1) + ORDER_MIN_TIME);
+    }
+    
+    while (phone_calls > NUM_TELEPHONES) {
+		pthread_cond_wait(&call_available, &calling_mutex);
+    }
+    
+    phone_calls ++;
+    pthread_mutex_unlock(&calling_mutex);
+    
     pthread_exit(NULL);
+    // εδώ περιμένουν οι πελάτες για ελεύθερο τηλεφωνητή
 }
 
 
 void *telephone_thread(void *arg) {
     int telephone_id = *((int *)arg);
-    // 
+    
+    pthread_mutex_lock(&phone_mutex);
+    
+    sleep(rand() % (PAYMENT_MAX_TIME - PAYMENT_MIN_TIME + 1) + PAYMENT_MIN_TIME);
+    
+    payment = rand() % 105; //P(fail) + P(m) + P(p) + P(s) = 105%
+    if (payment < 100) {
+    	successful_orders ++;
+    	pizza_quantity = rand() % (PIZZA_MAX_QUANTITY - PIZZA_MIN_QUANTITY + 1) + PIZZA_MIN_QUANTITY;
+    	
+    	for (int i; i < pizza_quantity; i++) {
+    		pizza_type = rand() % (100) //P(m) + P(p) + P(s) = 100%
+    		if (pizza_type < P_MARGARITA) {
+    			margherita_sold ++;
+    			total_revenue += C_MARGARITA;
+    		} else if (pizza_type < P_MARGARITA + P_PEPERONI) {
+    			pepperoni_sold ++;
+    			total_revenue += C_PEPERONI;
+    		} else {
+    			special_sold++;
+    			total_revenue += C_SPECIAL;
+            }
+    	}
+    	
+    } else {
+    	failed_orders ++;
+    }
+    
+    phone_calls --;
+    pthread_cond_signal(&call_available);
+
+    pthread_mutex_unlock(&phone_mutex);
+    
     pthread_exit(NULL);
+    // εδώ εκτελούνται οι παραγγελείες
 }
 
 
