@@ -27,6 +27,9 @@
 #define DELIVERY_MIN_TIME 5
 #define DELIVERY_MAX_TIME 15
 
+pthread_mutex_t order_threads_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t order_threads_cond = PTHREAD_COND_INITIALIZER;
+
 pthread_mutex_t calling_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t call_available = PTHREAD_COND_INITIALIZER;
 
@@ -40,12 +43,14 @@ pthread_cond_t deliverer_available = PTHREAD_COND_INITIALIZER;
 
 pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+unsigned int seed;
+int random_number;
+int current_thread = 1;
 int phone_calls = 0;
-int pizza_type = 0;
-int pizza_quantity = 0;
 int total_revenue = 0;
 int margherita_sold = 0;
 int pepperoni_sold = 0;
 int special_sold = 0;
 int successful_orders = 0;
 int failed_orders = 0;
+int cooks_occupied = 0;
