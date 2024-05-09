@@ -23,20 +23,21 @@ void *customer_thread(void *arg) {
         pthread_cond_wait(&order_threads_cond, &order_threads_mutex);
     }
 
-    // printf("Customer: %d \n is calling/waiting available phones", customer.cid);
-
     if (customer.cid != 1) {                   // Η if είναι μέσα στο mutex καθώς ένας πελάτης έρχεται μετά από [ORDER_MIN_TIME, ORDER_MAX_TIME] από τον πρηγούμενο (επομένως μόνο όταν περάσει ο ένας πρέπει να ξεκινήσει ο χρόνος).
         random_number = rand_r(&seed);          // Αλλιώς σπάσε το ένα mutex(order_threads_mutex) σε δυο mutex.
     	sleep(random_number % (ORDER_MAX_TIME - ORDER_MIN_TIME + 1) + ORDER_MIN_TIME);
     }
+
+    current_thread++;
+    pthread_cond_broadcast(&order_threads_cond);
+
+    // printf("Customer: %d \n is calling/waiting available phones", customer.cid);
 
     while (phone_calls >= NUM_TELEPHONES) {     // Η συνθήκη φροντίζει οι κλήσεις να μην είναι παραπάνω από τους τηλεφωνητές.
 		pthread_cond_wait(&call_available, &order_threads_mutex);  
     }
     
     phone_calls ++;
-    current_thread++;
-    pthread_cond_broadcast(&order_threads_cond);
 
     pthread_mutex_unlock(&order_threads_mutex);
 
