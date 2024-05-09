@@ -11,16 +11,21 @@ typedef struct {
     // εδώ τα πεδία που χρειάζονται για την κάθε παραγγελία
 } OrderData;
 
+void *customer_thread(void *arg);
+void *telephone_thread(void *arg);
+
 void *customer_thread(void *arg) {
-    OrderData *customer = (OrderData *)arg;
+    OrderData customer = *((OrderData *) arg);
 
     pthread_mutex_lock(&order_threads_mutex);
     
-    while (customer->cid != current_thread) {   // Η συνθήκη φροντίζει οι πελάτες να εξυπηρετούνται με την σειρά από 1 έως Ncust.
+    while (customer.cid != current_thread) {   // Η συνθήκη φροντίζει οι πελάτες να εξυπηρετούνται με την σειρά από 1 έως Ncust.
         pthread_cond_wait(&order_threads_cond, &order_threads_mutex);
     }
 
-    if (customer->cid != 1) {                   // Η if είναι μέσα στο mutex καθώς ένας πελάτης έρχεται μετά από [ORDER_MIN_TIME, ORDER_MAX_TIME] από τον πρηγούμενο (επομένως μόνο όταν περάσει ο ένας πρέπει να ξεκινήσει ο χρόνος).
+    // printf("Customer: %d \n is calling/waiting available phones", customer.cid);
+
+    if (customer.cid != 1) {                   // Η if είναι μέσα στο mutex καθώς ένας πελάτης έρχεται μετά από [ORDER_MIN_TIME, ORDER_MAX_TIME] από τον πρηγούμενο (επομένως μόνο όταν περάσει ο ένας πρέπει να ξεκινήσει ο χρόνος).
         random_number = rand_r(&seed);          // Αλλιώς σπάσε το ένα mutex(order_threads_mutex) σε δυο mutex.
     	sleep(random_number % (ORDER_MAX_TIME - ORDER_MIN_TIME + 1) + ORDER_MIN_TIME);
     }
@@ -35,20 +40,22 @@ void *customer_thread(void *arg) {
 
     pthread_mutex_unlock(&order_threads_mutex);
 
-    telephone_thread(&customer[customer->cid - 1]);
+    telephone_thread(&customer);
     pthread_exit(NULL);
     // εδώ περιμένουν οι πελάτες για ελεύθερο τηλεφωνητή
 }
 
 void *telephone_thread(void *arg) {
-    OrderData *customer = (OrderData *)arg;
+    OrderData customer = *((OrderData *) arg);
     int pizza_type; // αρκεί να είναι τοπική μεταβλητή
+    int payment; // αρκεί να είναι τοπική μεταβλητή
     
-    pthread_mutex_lock(&phone_mutex);
-    
+    // printf("Customer: %d \n is going to order", customer.cid);
+
     random_number = rand_r(&seed);
     sleep(random_number % (PAYMENT_MAX_TIME - PAYMENT_MIN_TIME + 1) + PAYMENT_MIN_TIME);
     
+    pthread_mutex_lock(&phone_mutex);
     payment = rand() % 105; // P(fail) + P(m) + P(p) + P(s) = 105%
     if (payment < 100) {
     	successful_orders ++;
@@ -74,7 +81,7 @@ void *telephone_thread(void *arg) {
     }
     
     phone_calls --;
-    pthread_cond_signal(&call_available);
+    pthread_cond_broadcast(&call_available);
 
     pthread_mutex_unlock(&phone_mutex);
     
@@ -85,7 +92,7 @@ void *telephone_thread(void *arg) {
 
 void *cook_thread(void *arg) {
 
-    int cook_id = *((int *)arg);
+    OrderData customer = *((OrderData *) arg);
     pthread_mutex_lock(&cook_mutex);
     
     while (cooks_occupied >= NUM_COOKS) {        // Η συνθήκη φροντίζει οι παραγγελείες που ετοιμάζονται να μην είναι παραπάνω από τους μάγειρες.
@@ -104,6 +111,8 @@ void *cook_thread(void *arg) {
 
 
 void *deliverer_thread(void *arg) {
+
+ OrderData customer = *((OrderData *) arg);
  while (1) { // εβαλα 1 γιατι δεν ξερω αν το vm του εργαστηριου εχει c99 η μεταγενεστερη εκδοση της c
         
         pthread_mutex_lock(&order_mutex);
@@ -131,8 +140,9 @@ int main(int argc, char *argv[]) {
     OrderData customer[Ncust];
    
     for (int i = 0; i < Ncust; i++) {
-        customer[i].cid = i + 1;
-        pthread_create(&customer_threads[i], NULL, customer_thread, &customer[i]);
+        customer[i] = (OrderData *)malloc(sizeof(OrderData));
+        customer[i]->cid = i + 1;
+        pthread_create(&customer_threads[i], NULL, customer_thread, (void *)customer[i]);
     }
    
     for (int i = 0; i < Ncust; i++) {
