@@ -16,7 +16,7 @@ void *customer_thread(void *arg) {
 
     pthread_mutex_lock(&order_threads_mutex);
     
-    while (customer->cid != current_thread) {
+    while (customer->cid != current_thread) {   // Η συνθήκη φροντίζει οι πελάτες να εξυπηρετούνται με την σειρά από 1 έως Ncust.
         pthread_cond_wait(&order_threads_cond, &order_threads_mutex);
     }
 
@@ -25,7 +25,7 @@ void *customer_thread(void *arg) {
     	sleep(random_number % (ORDER_MAX_TIME - ORDER_MIN_TIME + 1) + ORDER_MIN_TIME);
     }
 
-    while (phone_calls >= NUM_TELEPHONES) {
+    while (phone_calls >= NUM_TELEPHONES) {     // Η συνθήκη φροντίζει οι κλήσεις να μην είναι παραπάνω από τους τηλεφωνητές.
 		pthread_cond_wait(&call_available, &order_threads_mutex);  
     }
     
@@ -88,8 +88,8 @@ void *cook_thread(void *arg) {
     int cook_id = *((int *)arg);
     pthread_mutex_lock(&cook_mutex);
     
-    while (cooks_occupied >= NUM_COOKS) {
-		pthread_cond_wait(&cook_available, &cook_mutex);
+    while (cooks_occupied >= NUM_COOKS) {        // Η συνθήκη φροντίζει οι παραγγελείες που ετοιμάζονται να μην είναι παραπάνω από τους μάγειρες.
+		pthread_cond_wait(&cook_available, &cook_mutex);  
     }
     
     cooks_occupied ++;
