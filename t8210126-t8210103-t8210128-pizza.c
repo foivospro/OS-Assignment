@@ -13,14 +13,14 @@ typedef struct {
 } OrderData;
 
 
-struct timespec start_time, end_time;
+//struct timespec start_time, end_time;
 // Χρήση της clock_gettime για να καταγράψετε την αρχή της πράξης
-clock_gettime(CLOCK_REALTIME, &start_time);
+//clock_gettime(CLOCK_REALTIME, &start_time);
 // Χρήση της clock_gettime για να καταγράψετε το τέλος της πράξης
-clock_gettime(CLOCK_REALTIME, &end_time);
+//clock_gettime(CLOCK_REALTIME, &end_time);
 // Υπολογισμός του χρόνου που πέρασε σε δευτερόλεπτα
-long X_seconds = end_time.tv_sec - start_time.tv_sec;
-long Y_seconds = end_time.tv_sec - start_time.tv_sec;
+//long X_seconds = end_time.tv_sec - start_time.tv_sec;
+//long Y_seconds = end_time.tv_sec - start_time.tv_sec;
 
 
 
