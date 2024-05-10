@@ -57,8 +57,8 @@ void *telephone_thread(void *arg) {
     sleep(random_number % (PAYMENT_MAX_TIME - PAYMENT_MIN_TIME + 1) + PAYMENT_MIN_TIME);
     
     pthread_mutex_lock(&phone_mutex);
-    payment = rand() % 105; // P(fail) + P(m) + P(p) + P(s) = 105%
-    if (payment < 100) {
+    payment = rand() % 100;
+    if (payment < 95) {
     	successful_orders ++;
         random_number = rand_r(&seed);
     	customer.pizza_quantity = random_number % (PIZZA_MAX_QUANTITY - PIZZA_MIN_QUANTITY + 1) + PIZZA_MIN_QUANTITY; //Fix
