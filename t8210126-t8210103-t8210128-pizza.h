@@ -33,6 +33,9 @@ pthread_cond_t order_threads_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t calling_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t call_available = PTHREAD_COND_INITIALIZER;
 
+pthread_mutex_t oven_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t oven_available = PTHREAD_COND_INITIALIZER;
+
 pthread_mutex_t phone_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 pthread_mutex_t cook_mutex = PTHREAD_MUTEX_INITIALIZER;
