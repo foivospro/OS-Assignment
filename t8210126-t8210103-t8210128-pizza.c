@@ -31,7 +31,7 @@ void *customer_thread(void *arg) {
     
     while (customer.cid != current_thread) {   // Η συνθήκη φροντίζει οι πελάτες να εξυπηρετούνται με την σειρά από 1 έως Ncust.
         pthread_cond_wait(&order_threads_cond, &order_threads_mutex);
-    } // δεν ειναι σωστο, αφου επιτρεπεται πχ ο πελατης 2 να παρει τηλ πιο μετα απο τον 3ο.
+    } // δεν ειναι σωστο, αφου ετσι δεν επιτρεπεται  πχ ο πελατης 2 να παρει τηλ πιο μετα απο τον 3ο.
 
     if (customer.cid != 1) {                   // Η if είναι μέσα στο mutex καθώς ένας πελάτης έρχεται μετά από [ORDER_MIN_TIME, ORDER_MAX_TIME] από τον πρηγούμενο (επομένως μόνο όταν περάσει ο ένας πρέπει να ξεκινήσει ο χρόνος).
         random_number = rand_r(&seed);          // Αλλιώς σπάσε το ένα mutex(order_threads_mutex) σε δυο mutex.
