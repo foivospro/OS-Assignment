@@ -5,14 +5,12 @@
 #include "t8210126-t8210103-t8210128-pizza.h"
 
 typedef struct {
+// εδώ τα πεδία που χρειάζονται για την κάθε παραγγελία
     int cid;
     int order_number;
     int pizza_quantity;
-    // εδώ τα πεδία που χρειάζονται για την κάθε παραγγελία
 } OrderData;
 
-void *customer_thread(void *arg);
-void *telephone_thread(void *arg);
 
 void *customer_thread(void *arg) {
     OrderData customer = *((OrderData *) arg);
@@ -57,10 +55,10 @@ void *telephone_thread(void *arg) {
     sleep(random_number % (PAYMENT_MAX_TIME - PAYMENT_MIN_TIME + 1) + PAYMENT_MIN_TIME);
     
     pthread_mutex_lock(&phone_mutex);
-    payment = rand() % 100;
-    if (payment < 95) {
+    payment = rand_r(&seed) % 100;
+    if (payment < 100 - P_FAILURE) {
     	successful_orders ++;
-        random_number = rand_r(&seed);
+        random_number = rand_r(&seed); // ιδιο ονομα χμμ
     	customer.pizza_quantity = random_number % (PIZZA_MAX_QUANTITY - PIZZA_MIN_QUANTITY + 1) + PIZZA_MIN_QUANTITY; //Fix
     	
     	for (int i; i < pizza_quantity; i++) {
@@ -74,7 +72,8 @@ void *telephone_thread(void *arg) {
     		} else {
     			special_sold++;
     			total_revenue += C_SPECIAL;
-            }
+            	}
+		
     	}
     	
     } else {
@@ -94,7 +93,7 @@ void *telephone_thread(void *arg) {
 void *cook_thread(void *arg) {
 
     OrderData customer = *((OrderData *) arg);
-    pthread_mutex_lock(&cook_mutex);
+    pthread_mutex_lock(&cook_mutex); // ΕΡΩΤΗΣΗ: μαλλον κατω απο το while?
     
     while (cooks_occupied >= NUM_COOKS) {        // Η συνθήκη φροντίζει οι παραγγελείες που ετοιμάζονται να μην είναι παραπάνω από τους μάγειρες.
 		pthread_cond_wait(&cook_available, &cook_mutex);  
