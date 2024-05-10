@@ -27,7 +27,7 @@ long Y_seconds = end_time.tv_sec - start_time.tv_sec;
 void *customer_thread(void *arg) {
     OrderData customer = *((OrderData *) arg);
 
-    pthread_mutex_lock(&order_threads_mutex); // το λοκ γινεται εδω ? μαλλον κατω απο το while?
+    pthread_mutex_lock(&order_threads_mutex); 
     
     while (customer.cid != current_thread) {   // Η συνθήκη φροντίζει οι πελάτες να εξυπηρετούνται με την σειρά από 1 έως Ncust.
         pthread_cond_wait(&order_threads_cond, &order_threads_mutex);
@@ -106,7 +106,7 @@ void *telephone_thread(void *arg) {
 void *cook_thread(void *arg) {
 
     OrderData customer = *((OrderData *) arg);
-    pthread_mutex_lock(&cook_mutex); // ΕΡΩΤΗΣΗ: μαλλον κατω απο το while?
+    pthread_mutex_lock(&cook_mutex); 
     
     while (cooks_occupied >= NUM_COOKS) {        // Η συνθήκη φροντίζει οι παραγγελείες που ετοιμάζονται να μην είναι παραπάνω από τους μάγειρες.
 		pthread_cond_wait(&cook_available, &cook_mutex);  
