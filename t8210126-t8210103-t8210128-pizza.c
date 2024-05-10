@@ -70,7 +70,7 @@ void *telephone_thread(void *arg) {
         random_number = rand_r(&seed); 
     	customer.pizza_quantity = random_number % (PIZZA_MAX_QUANTITY - PIZZA_MIN_QUANTITY + 1) + PIZZA_MIN_QUANTITY; //Fix
     	
-    	for (int i; i < pizza_quantity; i++) {
+    	for (int i = 0; i < pizza_quantity; i++) {
     		pizza_type = rand_r(&seed) % (100); 
     		if (pizza_type < P_MARGARITA) {
     			margherita_sold ++;
