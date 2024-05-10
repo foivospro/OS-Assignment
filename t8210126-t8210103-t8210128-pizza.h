@@ -62,3 +62,4 @@ int successful_orders = 0;
 int failed_orders = 0;
 int cooks_occupied = 0;
 int ovens_occupied = 0;
+int deliverers_occupied = 0;
