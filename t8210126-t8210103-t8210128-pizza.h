@@ -43,6 +43,10 @@ pthread_cond_t deliverer_available = PTHREAD_COND_INITIALIZER;
 
 pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+pthread_mutex_t success_orders_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t success_orders_cond = PTHREAD_COND_INITIALIZER;
+
+
 unsigned int seed;
 int random_number;
 int current_thread = 1;
