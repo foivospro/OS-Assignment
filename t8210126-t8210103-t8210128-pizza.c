@@ -11,6 +11,12 @@ typedef struct {
     int pizza_quantity;
 } OrderData;
 
+typedef struct {
+    int oid;
+    double serve_time; 
+    double cold_time;
+} SuccessfulOrder;
+
 
 void *customer_thread(void *arg) {
     OrderData customer = *((OrderData *) arg);
