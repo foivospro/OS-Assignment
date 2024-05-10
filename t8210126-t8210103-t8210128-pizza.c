@@ -62,7 +62,7 @@ void *telephone_thread(void *arg) {
     	customer.pizza_quantity = random_number % (PIZZA_MAX_QUANTITY - PIZZA_MIN_QUANTITY + 1) + PIZZA_MIN_QUANTITY; //Fix
     	
     	for (int i; i < pizza_quantity; i++) {
-    		pizza_type = rand() % (100); // P(m) + P(p) + P(s) = 100%
+    		pizza_type = rand_r(&seed) % (100); // P(m) + P(p) + P(s) = 100%
     		if (pizza_type < P_MARGARITA) {
     			margherita_sold ++;
     			total_revenue += C_MARGARITA;
