@@ -43,7 +43,7 @@ void *customer_thread(void *arg) {
 
     while (phone_calls >= NUM_TELEPHONES) {     // Η συνθήκη φροντίζει οι κλήσεις να μην είναι παραπάνω από τους τηλεφωνητές.
 		pthread_cond_wait(&call_available, &order_threads_mutex);  
-    }// εδω θα ειναι λοκ τοση ωρα
+    }
     
     phone_calls ++;
 	
