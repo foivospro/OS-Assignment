@@ -68,9 +68,9 @@ void *telephone_thread(void *arg) {
     pthread_mutex_lock(&phone_mutex);
     payment = rand_r(&seed) % 100;
     if (payment < 100 - P_FAILURE) {
-	pthread_mutex_lock(&print_mutex);
-	printf("Η παραγγελία με αριθμό %d καταχωρήθηκε.\n", customer->order_number);
-	pthread_mutex_unlock(&print_mutex);
+        pthread_mutex_lock(&print_mutex);
+        printf("Η παραγγελία με αριθμό %d καταχωρήθηκε.\n", customer->order_number);
+        pthread_mutex_unlock(&print_mutex);
     	successful_orders ++;
         random_number = rand_r(&seed); 
     	customer->pizza_quantity = random_number % (PIZZA_MAX_QUANTITY - PIZZA_MIN_QUANTITY + 1) + PIZZA_MIN_QUANTITY; //Fix
@@ -119,12 +119,12 @@ void *cook_thread(void *arg) {
     }
     
     cooks_occupied ++;
+    
+    pthread_mutex_unlock(&cook_mutex);
     for(int i = 0; i < customer->pizza_quantity ; i++){
     	sleep(PREP_TIME);    
     }
-    
-    pthread_mutex_unlock(&cook_mutex);
-    pthread_cond_signal(&cook_available);
+    pthread_cond_signal(&cook_available); // Λογικά είναι αχρείαστο εδώ
 
 
     oven_thread(customer);
@@ -157,7 +157,7 @@ void *oven_thread(void *arg) {
 
     ovens_occupied = ovens_occupied + customer->pizza_quantity;
     pthread_mutex_unlock(&oven_mutex);
-    pthread_cond_signal(&oven_available);
+    pthread_cond_signal(&oven_available); // Λογικά είναι αχρείαστο εδώ
 }
 
 
