@@ -170,6 +170,8 @@ void *deliverer_thread(void *arg) {
      }
      deliverers_occupied ++;
      ovens_occupied = ovens_occupied - customer->pizza_quantity;
+
+     pthread_mutex_unlock(&deliverer_mutex);
      sleep(PACK_TIME);
 
      pthread_mutex_lock(&print_mutex);
@@ -185,10 +187,11 @@ void *deliverer_thread(void *arg) {
 	 pthread_mutex_unlock(&print_mutex);
 
      sleep(delivery_time);
+
+     pthread_mutex_lock(&deliverer_mutex);
      deliverers_occupied --;
-	
-     pthread_mutex_unlock(&deliverer_mutex);
      pthread_cond_signal(&deliverer_available);
+     pthread_mutex_unlock(&deliverer_mutex);
      pthread_exit(NULL);
 }
 
