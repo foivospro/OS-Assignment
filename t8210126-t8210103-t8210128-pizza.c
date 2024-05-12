@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
     OrderData *customer[Ncust];
 
     for (int i = 0; i < Ncust; i++) {
-        customer[i] = (OrderData *)malloc(sizeof(OrderData));
+        customer[i] = (OrderData *)malloc(sizeof(OrderData)); // must be free
         customer[i]->cid = i + 1;
         customer[i]->order_number = i + 1;
         pthread_create(&customer_threads[i], NULL, customer_thread, (void *)customer[i]);
