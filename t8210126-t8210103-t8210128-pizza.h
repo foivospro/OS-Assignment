@@ -1,3 +1,5 @@
+#include <pthread.h>
+
 #define NUM_TELEPHONES 2
 #define NUM_COOKS 2
 #define NUM_OVENS 10
@@ -43,7 +45,7 @@ pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t success_orders_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t success_orders_cond = PTHREAD_COND_INITIALIZER;
 
-
+unsigned int seed;
 int random_number;
 int current_thread = 1;
 int phone_calls = 0;
@@ -56,3 +58,7 @@ int failed_orders = 0;
 int cooks_occupied = 0;
 int ovens_occupied = 0;
 int deliverers_occupied = 0;
+double total_service_time = 0;
+double total_cooling_time = 0;
+int max_service_time = 0;
+int max_cooling_time = 0;
