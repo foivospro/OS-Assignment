@@ -82,14 +82,14 @@ void *telephone_thread(void *arg) {
         phone_calls --;
         pthread_cond_broadcast(&call_available);
         pthread_mutex_unlock(&phone_mutex);
-	    cook_thread(customer);
+	cook_thread(customer);
     } else {
         customer->status = FAILED;
     	failed_orders ++;
         pthread_mutex_lock(&print_mutex);
         printf("Η παραγγελία με αριθμό %d απέτυχε.\n", customer->order_number);
         pthread_mutex_unlock(&print_mutex);
-	    phone_calls --;
+	phone_calls --;
         pthread_cond_broadcast(&call_available);
         pthread_mutex_unlock(&phone_mutex);
     }
@@ -101,7 +101,7 @@ void *cook_thread(void *arg) {
     OrderData *customer = (OrderData *) arg;
     pthread_mutex_lock(&cook_mutex);  
     while (cooks_occupied >= NUM_COOKS) {        // Η συνθήκη φροντίζει οι παραγγελείες που ετοιμάζονται να μην είναι παραπάνω από τους μάγειρες.
-		pthread_cond_wait(&cook_available, &cook_mutex);  
+    	pthread_cond_wait(&cook_available, &cook_mutex);  
     }
     cooks_occupied ++;
     pthread_mutex_unlock(&cook_mutex);
@@ -123,7 +123,7 @@ void *oven_thread(void *arg) {
     OrderData *customer = (OrderData *) arg;
     pthread_mutex_lock(&oven_mutex);
     while (ovens_occupied + customer->pizza_quantity > NUM_OVENS) {        
-		pthread_cond_wait(&oven_available, &oven_mutex);  
+	pthread_cond_wait(&oven_available, &oven_mutex);  
     }	
     ovens_occupied = ovens_occupied + customer->pizza_quantity;
     pthread_mutex_unlock(&oven_mutex);
@@ -135,7 +135,7 @@ void *deliverer_thread(void *arg) {
      int delivery_time;
      pthread_mutex_lock(&deliverer_mutex);
      while (deliverers_occupied >= NUM_DELIVERERS) {        
-		pthread_cond_wait(&deliverer_available, &deliverer_mutex);  
+	pthread_cond_wait(&deliverer_available, &deliverer_mutex);  
      }
      deliverers_occupied ++;
      ovens_occupied = ovens_occupied - customer->pizza_quantity;
@@ -152,8 +152,8 @@ void *deliverer_thread(void *arg) {
      clock_gettime(CLOCK_REALTIME, &customer->delivery_time);
      long Y_seconds = customer->delivery_time.tv_sec - customer->arrival_time.tv_sec;
      pthread_mutex_lock(&print_mutex);
-	 printf("Η παραγγελία με αριθμό %d παραδώθηκε σε %ld λεπτά.\n", customer->order_number, Y_seconds);
-	 pthread_mutex_unlock(&print_mutex);
+     printf("Η παραγγελία με αριθμό %d παραδώθηκε σε %ld λεπτά.\n", customer->order_number, Y_seconds);
+     pthread_mutex_unlock(&print_mutex);
      sleep(delivery_time);
      pthread_mutex_lock(&deliverer_mutex);
      deliverers_occupied --;
@@ -201,27 +201,20 @@ int main(int argc, char *argv[]) {
         printf("Usage: %s <Ncust> <Seed>\n", argv[0]);
         return 1;
     }
-
     int Ncust = atoi(argv[1]);
     seed = atoi(argv[2]);
-    
     pthread_t customer_threads[Ncust];
     OrderData *customer[Ncust];
-
     for (int i = 0; i < Ncust; i++) {
         customer[i] = (OrderData *)malloc(sizeof(OrderData));
         customer[i]->cid = i + 1;
         customer[i]->order_number = i + 1;
         pthread_create(&customer_threads[i], NULL, customer_thread, (void *)customer[i]);
     }
-   
     for (int i = 0; i < Ncust; i++) {
         pthread_join(customer_threads[i], NULL);
-	    free(customer[i]);
+	free(customer[i]);
     }
-	
     print_statistics(Ncust, customer);
-
-    
     return 0;
 }
