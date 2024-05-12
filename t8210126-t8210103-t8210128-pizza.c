@@ -124,7 +124,7 @@ void *cook_thread(void *arg) {
     for(int i = 0; i < customer->pizza_quantity ; i++){
     	sleep(PREP_TIME);    
     }
-    pthread_cond_signal(&cook_available); // Λογικά είναι αχρείαστο εδώ
+  
 
 
     oven_thread(customer);
@@ -157,7 +157,6 @@ void *oven_thread(void *arg) {
 
     ovens_occupied = ovens_occupied + customer->pizza_quantity;
     pthread_mutex_unlock(&oven_mutex);
-    pthread_cond_signal(&oven_available); // Λογικά είναι αχρείαστο εδώ
 }
 
 
@@ -225,7 +224,7 @@ int main(int argc, char *argv[]) {
     OrderData *customer[Ncust];
 
     for (int i = 0; i < Ncust; i++) {
-        customer[i] = (OrderData *)malloc(sizeof(OrderData)); // must be free
+        customer[i] = (OrderData *)malloc(sizeof(OrderData));
         customer[i]->cid = i + 1;
         customer[i]->order_number = i + 1;
         pthread_create(&customer_threads[i], NULL, customer_thread, (void *)customer[i]);
@@ -233,6 +232,7 @@ int main(int argc, char *argv[]) {
    
     for (int i = 0; i < Ncust; i++) {
         pthread_join(customer_threads[i], NULL);
+	free(customer[i]);
     }
 	
     print_statistics(Ncust);
