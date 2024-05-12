@@ -44,7 +44,6 @@ pthread_mutex_t success_orders_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t success_orders_cond = PTHREAD_COND_INITIALIZER;
 
 
-unsigned int seed;
 int random_number;
 int current_thread = 1;
 int phone_calls = 0;
