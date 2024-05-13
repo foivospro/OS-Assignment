@@ -35,11 +35,10 @@ pthread_cond_t cook_available = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t deliverer_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t deliverer_available = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t print_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t success_orders_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t success_orders_cond = PTHREAD_COND_INITIALIZER;
 
 unsigned int seed;
 int random_number;
+int rc;
 int current_thread = 1;
 int phone_calls = 0;
 int total_revenue = 0;
