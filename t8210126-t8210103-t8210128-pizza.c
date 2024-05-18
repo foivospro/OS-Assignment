@@ -30,13 +30,13 @@ typedef struct {
 
 void *customer_thread(void *arg) {
     OrderData *customer = (OrderData *) arg;
-    pthread_mutex_lock(&order_threads_mutex);
+    rc = pthread_mutex_lock(&order_threads_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
     while (customer->cid != current_thread) {   // Η συνθήκη φροντίζει οι πελάτες να εξυπηρετούνται με την σειρά από 1 έως Ncust.
-        pthread_cond_wait(&order_threads_cond, &order_threads_mutex);
+        rc = pthread_cond_wait(&order_threads_cond, &order_threads_mutex);
         if (rc != 0) {	
 		printf("ERROR: return code from pthread_cond_wait() is %d\n", rc);
 		pthread_exit(&(customer->cid));
@@ -48,20 +48,20 @@ void *customer_thread(void *arg) {
         sleep(random_number % (ORDER_MAX_TIME - ORDER_MIN_TIME + 1) + ORDER_MIN_TIME);
     }
     current_thread++;
-    pthread_cond_broadcast(&order_threads_cond);
+    rc = pthread_cond_broadcast(&order_threads_cond);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_cond_broadcast() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }	
     while (phone_calls >= NUM_TELEPHONES) {     // Η συνθήκη φροντίζει οι κλήσεις να μην είναι παραπάνω από τους τηλεφωνητές.
-        pthread_cond_wait(&call_available, &order_threads_mutex);
+        rc = pthread_cond_wait(&call_available, &order_threads_mutex);
         if (rc != 0) {	
 		printf("ERROR: return code from pthread_cond_wait() is %d\n", rc);
 		pthread_exit(&(customer->cid));
 	} 
     }
     phone_calls ++;
-    pthread_mutex_unlock(&order_threads_mutex);
+    rc = pthread_mutex_unlock(&order_threads_mutex);
 	if (rc != 0) {	
 		printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
 		pthread_exit(&(customer->cid));
@@ -76,20 +76,20 @@ void *telephone_thread(void *arg) {
     int payment; // αρκεί να είναι τοπική μεταβλητή
     random_number = rand_r(&seed);
     sleep(random_number % (PAYMENT_MAX_TIME - PAYMENT_MIN_TIME + 1) + PAYMENT_MIN_TIME);
-    pthread_mutex_lock(&phone_mutex);
+    rc = pthread_mutex_lock(&phone_mutex);
 	if (rc != 0) {	
 		printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
 		pthread_exit(&(customer->cid));
 	}
     payment = rand_r(&seed) % 100;
     if (payment < 100 - P_FAILURE) {
-        pthread_mutex_lock(&print_mutex);
+        rc = pthread_mutex_lock(&print_mutex);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
             pthread_exit(&(customer->cid));
         }
         printf("Η παραγγελία με αριθμό %d καταχωρήθηκε.\n", customer->order_number);
-        pthread_mutex_unlock(&print_mutex);
+        rc = pthread_mutex_unlock(&print_mutex);
     	if (rc != 0) {	
             printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
             pthread_exit(&(customer->cid));
@@ -112,12 +112,12 @@ void *telephone_thread(void *arg) {
             	}
     	}
         phone_calls --;
-        pthread_cond_broadcast(&call_available);
+        rc = pthread_cond_broadcast(&call_available);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_cond_broadcast() is %d\n", rc);
             pthread_exit(&(customer->cid));
         }
-        pthread_mutex_unlock(&phone_mutex);
+        rc = pthread_mutex_unlock(&phone_mutex);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
             pthread_exit(&(customer->cid));
@@ -126,24 +126,24 @@ void *telephone_thread(void *arg) {
     } else {
         customer->status = FAILED;
     	failed_orders ++;
-        pthread_mutex_lock(&print_mutex);
+        rc = pthread_mutex_lock(&print_mutex);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
             pthread_exit(&(customer->cid));
         }
         printf("Η παραγγελία με αριθμό %d απέτυχε.\n", customer->order_number);
-        pthread_mutex_unlock(&print_mutex);
+        rc = pthread_mutex_unlock(&print_mutex);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
             pthread_exit(&(customer->cid));
 	}
 	phone_calls --;
-        pthread_cond_broadcast(&call_available);
+        rc = pthread_cond_broadcast(&call_available);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_cond_broadcast() is %d\n", rc);
             pthread_exit(&(customer->cid));
         }
-        pthread_mutex_unlock(&phone_mutex);
+        rc = pthread_mutex_unlock(&phone_mutex);
     	if (rc != 0) {	
             printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
             pthread_exit(&(customer->cid));
@@ -155,20 +155,20 @@ void *telephone_thread(void *arg) {
 
 void *cook_thread(void *arg) {
     OrderData *customer = (OrderData *) arg;
-    pthread_mutex_lock(&cook_mutex);
+    rc = pthread_mutex_lock(&cook_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }  
     while (cooks_occupied >= NUM_COOKS) {        // Η συνθήκη φροντίζει οι παραγγελείες που ετοιμάζονται να μην είναι παραπάνω από τους μάγειρες.
-    	pthread_cond_wait(&cook_available, &cook_mutex);
+    	rc = pthread_cond_wait(&cook_available, &cook_mutex);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_cond_wait() is %d\n", rc);
             pthread_exit(&(customer->cid));
         }
     }
     cooks_occupied ++;
-    pthread_mutex_unlock(&cook_mutex);
+    rc = pthread_mutex_unlock(&cook_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
         pthread_exit(&(customer->cid));
@@ -177,18 +177,18 @@ void *cook_thread(void *arg) {
     	sleep(PREP_TIME);    
     }
     oven_thread(customer);
-    pthread_mutex_lock(&cook_mutex);
+    rc = pthread_mutex_lock(&cook_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
     cooks_occupied --;
-    pthread_mutex_unlock(&cook_mutex);
+    rc = pthread_mutex_unlock(&cook_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
-    pthread_cond_signal(&cook_available);
+    rc = pthread_cond_signal(&cook_available);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_cond_signal() is %d\n", rc);
         pthread_exit(&(customer->cid));
@@ -201,20 +201,20 @@ void *cook_thread(void *arg) {
 
 void *oven_thread(void *arg) {
     OrderData *customer = (OrderData *) arg;
-    pthread_mutex_lock(&oven_mutex);
+    rc = pthread_mutex_lock(&oven_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
     while (ovens_occupied + customer->pizza_quantity > NUM_OVENS) {        
-	pthread_cond_wait(&oven_available, &oven_mutex);
+	rc = pthread_cond_wait(&oven_available, &oven_mutex);
         if (rc != 0) {	
                 printf("ERROR: return code from pthread_cond_wait() is %d\n", rc);
                 pthread_exit(&(customer->cid));
         }  
     }	
     ovens_occupied = ovens_occupied + customer->pizza_quantity;
-    pthread_mutex_unlock(&oven_mutex);
+    rc = pthread_mutex_unlock(&oven_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
         pthread_exit(&(customer->cid));
@@ -225,13 +225,13 @@ void *oven_thread(void *arg) {
 void *deliverer_thread(void *arg) {
     OrderData *customer = (OrderData *) arg;
     int delivery_time;
-    pthread_mutex_lock(&deliverer_mutex);
+    rc = pthread_mutex_lock(&deliverer_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
     while (deliverers_occupied >= NUM_DELIVERERS) {        
-	pthread_cond_wait(&deliverer_available, &deliverer_mutex);
+	rc = pthread_cond_wait(&deliverer_available, &deliverer_mutex);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_cond_wait() is %d\n", rc);
             pthread_exit(&(customer->cid));
@@ -239,7 +239,7 @@ void *deliverer_thread(void *arg) {
      }
     deliverers_occupied ++;
     ovens_occupied = ovens_occupied - customer->pizza_quantity;
-    pthread_mutex_unlock(&deliverer_mutex);
+    rc = pthread_mutex_unlock(&deliverer_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
         pthread_exit(&(customer->cid));
@@ -247,13 +247,13 @@ void *deliverer_thread(void *arg) {
     sleep(PACK_TIME);
     clock_gettime(CLOCK_REALTIME, &customer->pack_time);
     long X_seconds = customer->pack_time.tv_sec - customer->arrival_time.tv_sec;
-    pthread_mutex_lock(&print_mutex);
+    rc = pthread_mutex_lock(&print_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
     printf("Η παραγγελία με αριθμό %d ετοιμάστηκε σε %ld λεπτά.\n", customer->order_number, X_seconds); 
-    pthread_mutex_unlock(&print_mutex);
+    rc = pthread_mutex_unlock(&print_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
         pthread_exit(&(customer->cid));
@@ -263,30 +263,30 @@ void *deliverer_thread(void *arg) {
     sleep(delivery_time);
     clock_gettime(CLOCK_REALTIME, &customer->delivery_time);
     long Y_seconds = customer->delivery_time.tv_sec - customer->arrival_time.tv_sec;
-    pthread_mutex_lock(&print_mutex);
+    rc = pthread_mutex_lock(&print_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
     printf("Η παραγγελία με αριθμό %d παραδώθηκε σε %ld λεπτά.\n", customer->order_number, Y_seconds);
-    pthread_mutex_unlock(&print_mutex);
+    rc = pthread_mutex_unlock(&print_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
     sleep(delivery_time);
-    pthread_mutex_lock(&deliverer_mutex);
+    rc = pthread_mutex_lock(&deliverer_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
     deliverers_occupied --;
-    pthread_cond_signal(&deliverer_available);
+    rc = pthread_cond_signal(&deliverer_available);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_cond_signal() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }	
-    pthread_mutex_unlock(&deliverer_mutex);
+    rc = pthread_mutex_unlock(&deliverer_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
         pthread_exit(&(customer->cid));
@@ -341,14 +341,14 @@ int main(int argc, char *argv[]) {
         customer[i] = (OrderData *)malloc(sizeof(OrderData));
         customer[i]->cid = i + 1;
         customer[i]->order_number = i + 1;
-        pthread_create(&customer_threads[i], NULL, customer_thread, (void *)customer[i]);
+        rc = pthread_create(&customer_threads[i], NULL, customer_thread, (void *)customer[i]);
         if (rc != 0) {
     		printf("ERROR: return code from pthread_create() is %d\n", rc);
        		exit(-1);
 	    }
     }
     for (int i = 0; i < Ncust; i++) {
-        pthread_join(customer_threads[i], NULL);
+        rc = pthread_join(customer_threads[i], NULL);
         if (rc != 0) {
 			printf("ERROR: return code from pthread_join() is %d\n", rc);
 			exit(-1);	
