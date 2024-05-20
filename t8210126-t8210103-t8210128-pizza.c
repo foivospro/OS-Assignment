@@ -331,7 +331,6 @@ int main(int argc, char *argv[]) {
     }
     int Ncust = atoi(argv[1]);
     seed = atoi(argv[2]);
-    random_number = rand_r(&seed);
     pthread_t customer_threads[Ncust];
     OrderData *customer[Ncust];
     for (int i = 0; i < Ncust; i++) {
