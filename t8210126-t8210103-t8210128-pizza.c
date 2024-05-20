@@ -233,7 +233,7 @@ void *deliverer_thread(void *arg) {
         pthread_exit(&(customer->cid));
     }
     while (deliverers_occupied >= NUM_DELIVERERS) {        
-	rc = pthread_cond_wait(&deliverer_available, &deliverer_mutex);
+		rc = pthread_cond_wait(&deliverer_available, &deliverer_mutex);
         if (rc != 0) {	
             printf("ERROR: return code from pthread_cond_wait() is %d\n", rc);
             pthread_exit(&(customer->cid));
@@ -241,6 +241,11 @@ void *deliverer_thread(void *arg) {
      }
     deliverers_occupied ++;
     ovens_occupied = ovens_occupied - customer->pizza_quantity;
+    rc = pthread_cond_broadcast(&oven_available);
+    if (rc != 0) {	
+        printf("ERROR: return code from pthread_cond_broadcast() is %d\n", rc);
+        pthread_exit(&(customer->cid));
+    }
     rc = pthread_mutex_unlock(&deliverer_mutex);
     if (rc != 0) {	
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
@@ -361,9 +366,9 @@ int main(int argc, char *argv[]) {
     print_statistics(Ncust, customer);
     // Καταστροφή mutex και condition
 	rc = pthread_mutex_destroy(&order_threads_mutex);
-if (rc != 0) {
-	printf("ERROR: return code from pthread_mutex_destroy() is %d\n", rc);
-	exit(-1);		
+	if (rc != 0) {
+		printf("ERROR: return code from pthread_mutex_destroy() is %d\n", rc);
+		exit(-1);		
 	}
     rc = pthread_mutex_destroy(&calling_mutex);
 	if (rc != 0) {
