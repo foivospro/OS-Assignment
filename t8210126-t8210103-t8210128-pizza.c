@@ -44,6 +44,7 @@ void *customer_thread(void *arg) {
     } 
     clock_gettime(CLOCK_REALTIME, &customer->arrival_time);
     if (customer->cid != 1) {                   // Η if είναι μέσα στο mutex καθώς ένας πελάτης έρχεται μετά από [ORDER_MIN_TIME, ORDER_MAX_TIME] από τον πρηγούμενο (επομένως μόνο όταν περάσει ο ένας πρέπει να ξεκινήσει ο χρόνος).         // Αλλιώς σπάσε το ένα mutex(order_threads_mutex) σε δυο mutex.
+        random_number = rand_r(&seed);
         sleep(random_number % (ORDER_MAX_TIME - ORDER_MIN_TIME + 1) + ORDER_MIN_TIME);
     }
     current_thread++;
@@ -73,12 +74,14 @@ void *telephone_thread(void *arg) {
     OrderData *customer = (OrderData *) arg;
     int pizza_type; // αρκεί να είναι τοπική μεταβλητή
     int payment; // αρκεί να είναι τοπική μεταβλητή
+    random_number = rand_r(&seed);
     sleep(random_number % (PAYMENT_MAX_TIME - PAYMENT_MIN_TIME + 1) + PAYMENT_MIN_TIME);
     rc = pthread_mutex_lock(&phone_mutex);
 	if (rc != 0) {	
 		printf("ERROR: return code from pthread_mutex_lock() is %d\n", rc);
 		pthread_exit(&(customer->cid));
 	}
+    random_number = rand_r(&seed);
     payment = random_number % 100;
     if (payment < 100 - P_FAILURE) {
         rc = pthread_mutex_lock(&print_mutex);
@@ -94,8 +97,10 @@ void *telephone_thread(void *arg) {
 	}
         customer->status = SUCCESSFUL;
     	successful_orders ++;
+        random_number = rand_r(&seed);
     	customer->pizza_quantity = random_number % (PIZZA_MAX_QUANTITY - PIZZA_MIN_QUANTITY + 1) + PIZZA_MIN_QUANTITY; 
         for (int i = 0; i < customer->pizza_quantity; i++) {
+            random_number = rand_r(&seed);
     		pizza_type = random_number % (100); 
     		if (pizza_type < P_MARGARITA) {
     			margherita_sold ++;
@@ -255,6 +260,7 @@ void *deliverer_thread(void *arg) {
         printf("ERROR: return code from pthread_mutex_unlock() is %d\n", rc);
         pthread_exit(&(customer->cid));
     }
+    random_number = rand_r(&seed);
     delivery_time = (random_number % (DELIVERY_MAX_TIME - DELIVERY_MIN_TIME + 1)) + DELIVERY_MIN_TIME;
     sleep(delivery_time);
     clock_gettime(CLOCK_REALTIME, &customer->delivery_time);
