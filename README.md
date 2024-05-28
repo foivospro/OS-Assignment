@@ -2,9 +2,10 @@
 This repository has been created for the purpose of completing the assignment related to Operating Systems course
 
 
--To compile: gcc -o my_program t8210126-t8210103-t8210128-pizza.c t8210126-t8210103-t8210128-pizza.h -pthread
+-To compile: gcc -o test-res.sh t8210126-t8210103-t8210128-pizza.c t8210126-t8210103-t8210128-pizza.h -pthread
 
--To run: ./my_program 3 5
+-To run: ./test-res.sh 10 10   
+The first parameter specifies the number of customers , and the second parameter specifies the seed value.
 
 ## Παράδειγμα εκτέλεσης του προγράμματος 
 foiv@Phoebus:~/OS-Assignment$ ./test-res.sh 10 10
